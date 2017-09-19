@@ -71,7 +71,7 @@ public class Permissions extends CordovaPlugin {
             if (hasAllPermissions)
                 addProperty(returnObj, KEY_RESULT_AUTODENY, false);
             else
-                addProperty(returnObj, KEY_RESULT_AUTODENY, Build.VERSION.SDK_INT >= 23 && !ActivityCompat.shouldShowRequestPermissionRationale(cordova.getActivity(), permissions[0]));
+                addProperty(returnObj, KEY_RESULT_AUTODENY, hasAnyNeverAskAgainFlag(permissions));
             permissionsCallback.success(returnObj);
         } else {
             addProperty(returnObj, KEY_ERROR, ACTION_REQUEST_PERMISSION);
@@ -95,11 +95,8 @@ public class Permissions extends CordovaPlugin {
         } else {
             try {
                 JSONObject returnObj = new JSONObject();
-                addProperty(returnObj, KEY_RESULT_PERMISSION, cordova.hasPermission(permission.getString(0)));
-                if (cordova.hasPermission(permission.getString(0)))
-                    addProperty(returnObj, KEY_RESULT_AUTODENY, false);
-                else
-                    addProperty(returnObj, KEY_RESULT_AUTODENY, Build.VERSION.SDK_INT >= 23 && !ActivityCompat.shouldShowRequestPermissionRationale(cordova.getActivity(), permission.getString(0)));
+                boolean hasPermission = cordova.hasPermission(permission.getString(0));
+                addProperty(returnObj, KEY_RESULT_PERMISSION, hasPermission);
                 callbackContext.success(returnObj);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -155,6 +152,28 @@ public class Permissions extends CordovaPlugin {
         }
 
         return true;
+    }
+
+    private boolean hasAnyNeverAskAgainFlag(String[] permissions) {
+
+        for (String permission : permissions) {
+            if(GetNeverAskAgainFlag(permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //only call on permissions that are denied!
+    private boolean GetNeverAskAgainFlag(String permission) {
+        try {
+            if (cordova.hasPermission(permission)) return false;
+            return Build.VERSION.SDK_INT >= 23 && !ActivityCompat.shouldShowRequestPermissionRationale(cordova.getActivity(), permission);
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 
     private void addProperty(JSONObject obj, String key, Object value) {

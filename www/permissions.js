@@ -161,11 +161,21 @@ function deprecated(name) {
   console.warn("The new signature is '" + name + "(permission, successCallback, errorCallback)'");
 }
 
+var allPermissions = new Permissions();
+function testPermission(name) {
+    Object.keys(allPermissions).forEach(function(key) {
+        if (name == allPermissions[key]) return;
+    })
+    throw new Error("invalid permission: '" + name + "'.");
+}
+
 Permissions.prototype = {
     checkPermission: function(permission, successCallback, errorCallback) {
+        testPermission(permission);
         cordova.exec(successCallback, errorCallback, permissionsName, 'checkPermission', [permission]);
     },
     requestPermission: function(permission, successCallback, errorCallback) {
+        testPermission(permission);
         if (typeof permission === "function") {
             deprecated("requestPermission");
             successCallback = arguments[0];
@@ -175,6 +185,7 @@ Permissions.prototype = {
         cordova.exec(successCallback, errorCallback, permissionsName, 'requestPermission', [permission]);
     },
     requestPermissions: function(permissions, successCallback, errorCallback) {
+        permissions.forEach(function(permission) { testPermission(permission); });
         cordova.exec(successCallback, errorCallback, permissionsName, 'requestPermissions', permissions);
     }
 };
