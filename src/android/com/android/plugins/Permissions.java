@@ -66,6 +66,7 @@ public class Permissions extends CordovaPlugin {
             //Call checkPermission again to verify
             boolean hasAllPermissions = hasAllPermissions(permissions);
             addProperty(returnObj, KEY_RESULT_PERMISSION, hasAllPermissions);
+            addProperty(returnObj, KEY_RESULT_AUTODENY, "unknown");
             permissionsCallback.success(returnObj);
         } else {
             addProperty(returnObj, KEY_ERROR, ACTION_REQUEST_PERMISSION);
