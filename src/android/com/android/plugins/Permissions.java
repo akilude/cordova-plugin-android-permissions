@@ -1,6 +1,7 @@
 package com.android.plugins;
 
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -10,6 +11,7 @@ import org.json.JSONObject;
 
 /**
  * Created by JasonYang on 2016/3/11.
+ * Modified by L0laapk3 on 19/9/2017.
  */
 public class Permissions extends CordovaPlugin {
 
@@ -66,7 +68,10 @@ public class Permissions extends CordovaPlugin {
             //Call checkPermission again to verify
             boolean hasAllPermissions = hasAllPermissions(permissions);
             addProperty(returnObj, KEY_RESULT_PERMISSION, hasAllPermissions);
-            addProperty(returnObj, KEY_RESULT_AUTODENY, "unknown");
+            if (hasAllPermissions)
+                addProperty(returnObj, KEY_RESULT_AUTODENY, false);
+            else
+                addProperty(returnObj, KEY_RESULT_AUTODENY, Build.VERSION.SDK_INT >= 23 && !ActivityCompat.shouldShowRequestPermissionRationale(cordova.getActivity(), permissions[0]));
             permissionsCallback.success(returnObj);
         } else {
             addProperty(returnObj, KEY_ERROR, ACTION_REQUEST_PERMISSION);
@@ -94,7 +99,7 @@ public class Permissions extends CordovaPlugin {
                 if (cordova.hasPermission(permission.getString(0)))
                     addProperty(returnObj, KEY_RESULT_AUTODENY, false);
                 else
-                    addProperty(returnObj, KEY_RESULT_AUTODENY, Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(cordova.getActivity(), permission.getString(0)));
+                    addProperty(returnObj, KEY_RESULT_AUTODENY, Build.VERSION.SDK_INT >= 23 && !ActivityCompat.shouldShowRequestPermissionRationale(cordova.getActivity(), permission.getString(0)));
                 callbackContext.success(returnObj);
             } catch (JSONException e) {
                 e.printStackTrace();

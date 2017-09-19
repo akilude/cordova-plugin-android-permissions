@@ -5,7 +5,7 @@ Modification by L0laapk3:
 --------
 In the callback, there will be a second key in the object containing if the "Never Ask Again" flag was checked when the user declined. 
 This key is named: ```neverAskAgainFlag```. 
-This key is not present when requesting permission for multiple things at once (I was lazy)
+When requesting multiple permissions at once, this key will only have the value of the first permission.
 
 
 Example:
