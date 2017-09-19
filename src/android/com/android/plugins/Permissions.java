@@ -93,7 +93,7 @@ public class Permissions extends CordovaPlugin {
                 if (cordova.hasPermission(permission.getString(0)))
                     addProperty(returnObj, KEY_RESULT_AUTODENY, false);
                 else
-                    addProperty(returnObj, KEY_RESULT_AUTODENY, Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(permission.getString(0)));
+                    addProperty(returnObj, KEY_RESULT_AUTODENY, Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(cordova.getActivity(), permission.getString(0)));
                 callbackContext.success(returnObj);
             } catch (JSONException e) {
                 e.printStackTrace();
