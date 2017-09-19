@@ -163,10 +163,10 @@ function deprecated(name) {
 
 var allPermissions = new Permissions();
 function testPermission(name) {
-    Object.keys(allPermissions).forEach(function(key) {
-        if (name == allPermissions[key]) return;
-    })
-    throw new Error("invalid permission: '" + name + "'.");
+    if (Object.keys(allPermissions).every(function(key) {
+        return name != allPermissions[key]
+    }))
+        throw new Error("invalid permission: '" + name + "'");
 }
 
 Permissions.prototype = {
