@@ -1,6 +1,44 @@
 Android permission Cordova plugin
 ========
 
+Modification by L0laapk3:
+--------
+In the callback, there will be a second key in the object containing if the "Never Ask Again" flag was checked when the user declined. 
+This key is named: ```neverAskAgainFlag```. 
+This key is not present when requesting permission for multiple things at once (I was lazy)
+
+
+Example:
+```
+function callback( status ) {
+  if ( status.hasPermission ) {
+
+    execute success code here
+
+  } else if (status.neverAskAgainFlag) {
+
+    Dialog to go to app settings here so user can manually give permission
+
+  } else {
+
+    User clicked Deny manually
+
+  }
+}
+```
+
+
+--------
+
+
+
+
+
+
+
+
+
+
 This plugin is designed for supporting Android new permissions checking mechanism.
 
 Since Android 6.0, the Android permissions checking mechanism has been changed. In the past, the permissions were granted by users when they decide to install the app. Now, the permissions should be granted by a user when he/she is using the app.
