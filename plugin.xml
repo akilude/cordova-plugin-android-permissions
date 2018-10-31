@@ -16,7 +16,6 @@
 
   <!-- android -->
   <platform name="android">
-    <framework src="com.android.support:support-v4:+" />
     <js-module src="www/permissions.js" name="Permissions">
       <clobbers target="cordova.plugins.permissions" />
     </js-module>
