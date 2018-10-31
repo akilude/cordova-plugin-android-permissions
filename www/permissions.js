@@ -190,16 +190,7 @@ Permissions.prototype = {
     }
 };
 
-Permissions.prototype.hasPermission = function (permission, successCallback, errorCallback) {
-    console.warn("hasPermission() function deprecated. Considers using checkPermission()");
 
-    if (typeof permission === "function") {
-        deprecated("hasPermission");
-        successCallback = arguments[0];
-        errorCallback = arguments[1];
-        permission = arguments[2];
-    }
-    this.checkPermission.call(this, permission, successCallback, errorCallback);
-};
+
 
 module.exports = new Permissions();

@@ -8,25 +8,6 @@ This key is named: ```neverAskAgainFlag```.
 When requesting multiple permissions at once, this key will only have the value of the first permission.
 
 
-Example:
-```
-function callback( status ) {
-  if ( status.hasPermission ) {
-
-    execute success code here
-
-  } else if (status.neverAskAgainFlag) {
-
-    Dialog to go to app settings here so user can manually give permission
-
-  } else {
-
-    User clicked Deny manually
-
-  }
-}
-```
-
 
 --------
 
@@ -66,13 +47,6 @@ var permissions = cordova.plugins.permissions;
 permissions.checkPermission(permission, successCallback, errorCallback);
 permissions.requestPermission(permission, successCallback, errorCallback);
 permissions.requestPermissions(permissions, successCallback, errorCallback);
-```
-
-#### Deprecated API - still work now, will not support in the future.
-```javascript
-permissions.hasPermission(permission, successCallback, errorCallback);
-permissions.hasPermission(successCallback, errorCallback, permission);
-permissions.requestPermission(successCallback, errorCallback, permission);
 ```
 
 ### Permission Name
