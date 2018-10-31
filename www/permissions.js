@@ -192,30 +192,21 @@ Permissions.prototype = {
             var reject = function(){
                 _reject(new Error(permission + ' is not turned on'));
             };
-            self.checkPermission(
-                permission).then(function(status){
-                    if(status.hasPermission){
-                        resolve();
-                        return;
-                    }
-                    self.requestPermission(
-                        permission,
-                        function(status){
-                            return status.hasPermission
-                                ? resolve()
-                                : reject();
-                        },
-                        reject
-                    );
-                }function(e){
-                    reject
+            self.checkPermission(permission).then(function(status){
+                if(status.hasPermission){
+                    resolve();
+                    return;
                 }
-                
-            );
+                self.requestPermission(permission).then(function(status){
+                    return status.hasPermission ? resolve() : reject();
+                },function(r){
+                    reject
+                });
+            },function(e){
+                reject
+            });
         };
-        return typeof successCallback === "function"
-            ? execute(successCallback, errorCallback || function(){})
-            : new Promise(execute);
+        return new Promise(execute);
     },
     checkAndGetPermissions: function(permissions, successCallback, errorCallback){
         var self = this;
