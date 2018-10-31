@@ -185,7 +185,57 @@ Permissions.prototype = {
         return new Promise((resolve, reject) => {
             cordova.exec(function(result) { resolve(result) }, function(error) { reject(error) }, permissionsName, 'requestPermissions', permissions);
         });
+    },
+    checkAndGetPermission: function(permission, successCallback, errorCallback){
+        var self = this;
+        var execute = function(resolve, _reject){
+            var reject = function(){
+                _reject(new Error(permission + ' is not turned on'));
+            };
+            self.hasPermission(
+                permission,
+                function(status){
+                    if(status.hasPermission){
+                        resolve();
+                        return;
+                    }
+                    self.requestPermission(
+                        permission,
+                        function(status){
+                            return status.hasPermission
+                                ? resolve()
+                                : reject();
+                        },
+                        reject
+                    );
+                },
+                reject
+            );
+        };
+        return typeof successCallback === "function"
+            ? execute(successCallback, errorCallback || function(){})
+            : new Promise(execute);
+    },
+    checkAndGetPermissions: function(permissions, successCallback, errorCallback){
+        var self = this;
+        if(Array.isArray(permissions)){
+            permissions = permissions.map(function(permission){
+                return self.checkAndGetPermission(permission);
+            });
+            var execute = function(){
+                return Promise.all(permissions);
+            };
+            if(typeof successCallback !== "function"){
+                return execute();
+            }
+            execute()
+            .then(successCallback)
+            .catch(errorCallback || function(){});
+            return;
+        }
+        return this.checkAndGetPermission(permissions, successCallback, errorCallback);
     }
+
 };
 
 

@@ -47,6 +47,8 @@ var permissions = cordova.plugins.permissions;
 permissions.checkPermission(permission, successCallback, errorCallback);
 permissions.requestPermission(permission, successCallback, errorCallback);
 permissions.requestPermissions(permissions, successCallback, errorCallback);
+permissions.checkAndGetPermission(permission);   //return a Promise
+permissions.checkAndGetPermissions(permission_arr); //return a Promise
 ```
 
 ### Permission Name
