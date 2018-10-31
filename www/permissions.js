@@ -162,14 +162,8 @@ function deprecated(name) {
 }
 
 Permissions.prototype = {
-    hasPermission: function(permission, successCallback, errorCallback) {
-        if (typeof permission === "function") {
-            deprecated("hasPermission");
-            successCallback = arguments[0];
-            errorCallback = arguments[1];
-            permission = arguments[2];
-        }
-        cordova.exec(successCallback, errorCallback, permissionsName, 'hasPermission', [permission]);
+    checkPermission: function(permission, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, permissionsName, 'checkPermission', [permission]);
     },
     requestPermission: function(permission, successCallback, errorCallback) {
         if (typeof permission === "function") {
@@ -189,7 +183,7 @@ Permissions.prototype = {
             var reject = function(){
                 _reject(new Error(permission + ' is not turned on'));
             };
-            self.hasPermission(
+            self.checkPermission(
                 permission,
                 function(status){
                     if(status.hasPermission){
@@ -233,4 +227,17 @@ Permissions.prototype = {
         return this.checkAndGetPermission(permissions, successCallback, errorCallback);
     }
 };
+
+Permissions.prototype.hasPermission = function (permission, successCallback, errorCallback) {
+    console.warn("hasPermission() function deprecated. Considers using checkPermission()");
+
+    if (typeof permission === "function") {
+        deprecated("hasPermission");
+        successCallback = arguments[0];
+        errorCallback = arguments[1];
+        permission = arguments[2];
+    }
+    this.checkPermission.call(this, permission, successCallback, errorCallback);
+};
+
 module.exports = new Permissions();
