@@ -161,30 +161,27 @@ function deprecated(name) {
   console.warn("The new signature is '" + name + "(permission, successCallback, errorCallback)'");
 }
 
-var allPermissions = new Permissions();
-function testPermission(name) {
-    if (Object.keys(allPermissions).every(function(key) {
-        return name != allPermissions[key]
-    }))
-        throw new Error("invalid permission: '" + name + "'");
-}
-
 Permissions.prototype = {
-    
-    checkPermission: function(permission) {
-        return new Promise((resolve, reject) => {
-            cordova.exec(function(result) { resolve(result) }, function(error) { reject(error) }, permissionsName, 'checkPermission', [permission]);
-        });
+    hasPermission: function(permission, successCallback, errorCallback) {
+        if (typeof permission === "function") {
+            deprecated("hasPermission");
+            successCallback = arguments[0];
+            errorCallback = arguments[1];
+            permission = arguments[2];
+        }
+        cordova.exec(successCallback, errorCallback, permissionsName, 'hasPermission', [permission]);
     },
-    requestPermission: function(permission) {
-        return new Promise((resolve, reject) => {
-            cordova.exec(function(result) { resolve(result) }, function(error) { reject(error) }, permissionsName, 'requestPermission', [permission]);
-        });
+    requestPermission: function(permission, successCallback, errorCallback) {
+        if (typeof permission === "function") {
+            deprecated("requestPermission");
+            successCallback = arguments[0];
+            errorCallback = arguments[1];
+            permission = arguments[2];
+        }
+        cordova.exec(successCallback, errorCallback, permissionsName, 'requestPermission', [permission]);
     },
-    requestPermissions: function(permissions) {
-        return new Promise((resolve, reject) => {
-            cordova.exec(function(result) { resolve(result) }, function(error) { reject(error) }, permissionsName, 'requestPermissions', permissions);
-        });
+    requestPermissions: function(permissions, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, permissionsName, 'requestPermissions', permissions);
     },
     checkAndGetPermission: function(permission, successCallback, errorCallback){
         var self = this;
@@ -192,21 +189,29 @@ Permissions.prototype = {
             var reject = function(){
                 _reject(new Error(permission + ' is not turned on'));
             };
-            self.checkPermission(permission).then(function(status){
-                if(status.hasPermission){
-                    resolve();
-                    return;
-                }
-                self.requestPermission(permission).then(function(status){
-                    return status.hasPermission ? resolve() : reject();
-                },function(r){
-                    reject
-                });
-            },function(e){
+            self.hasPermission(
+                permission,
+                function(status){
+                    if(status.hasPermission){
+                        resolve();
+                        return;
+                    }
+                    self.requestPermission(
+                        permission,
+                        function(status){
+                            return status.hasPermission
+                                ? resolve()
+                                : reject();
+                        },
+                        reject
+                    );
+                },
                 reject
-            });
+            );
         };
-        return new Promise(execute);
+        return typeof successCallback === "function"
+            ? execute(successCallback, errorCallback || function(){})
+            : new Promise(execute);
     },
     checkAndGetPermissions: function(permissions, successCallback, errorCallback){
         var self = this;
@@ -227,15 +232,5 @@ Permissions.prototype = {
         }
         return this.checkAndGetPermission(permissions, successCallback, errorCallback);
     }
-
 };
-
-
-
-
-
-
-
-
-
 module.exports = new Permissions();

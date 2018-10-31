@@ -1,12 +1,5 @@
 Android permission Cordova plugin
 ========
---------
-
-
-
-
-
-
 
 This plugin is designed for supporting Android new permissions checking mechanism.
 
@@ -14,13 +7,11 @@ Since Android 6.0, the Android permissions checking mechanism has been changed. 
 
 For old Android plugins you (developers) are using may not support this new mechanism or already stop updating. So either to find a new plugin to solving this problem, nor trying to add the mechanism in the old plugin. If you don't want to do those, you can try this plugin.
 
-As a convenience we support browser and iOS platforms as well. But this plugin will simple reply that any permission checked of requested was granted.
-
 Installation
 --------
 
 ```bash
-cordova plugin add cordova-plugin-android-permissions
+cordova plugin add cordova-plugin-android-permissions@0.10.0
 ```
 
 ※ Support Android SDK >= 14
@@ -32,11 +23,17 @@ Usage
 
 ```javascript
 var permissions = cordova.plugins.permissions;
-permissions.checkPermission(permission, successCallback, errorCallback);
+permissions.hasPermission(permission, successCallback, errorCallback);
 permissions.requestPermission(permission, successCallback, errorCallback);
 permissions.requestPermissions(permissions, successCallback, errorCallback);
 permissions.checkAndGetPermission(permission);   //return a Promise
-permissions.checkAndGetPermissions(permission_arr); //return a Promise
+permissions.checkAndGetPermissions(permissions); //return a Promise
+```
+
+#### Deprecated API - still work now, will not support in the future.
+```javascript
+permissions.hasPermission(successCallback, errorCallback, permission);
+permissions.requestPermission(successCallback, errorCallback, permission);
 ```
 
 ### Permission Name
@@ -52,59 +49,41 @@ permissions.READ_CALENDAR
 ...
 ```
 
-## Examples
-```js
+Example
+--------
+
+```javascript
 var permissions = cordova.plugins.permissions;
-```
+permissions.hasPermission(permissions.CAMERA, checkPermissionCallback, null);
 
-#### Quick check
-```js
+function checkPermissionCallback(status) {
+  if(!status.hasPermission) {
+    var errorCallback = function() {
+      console.warn('Camera permission is not turned on');
+    }
 
-permissions.hasPermission(permissions.CAMERA, function( status ){
-  if ( status.hasPermission ) {
-    console.log("Yes :D ");
-  }
-  else {
-    console.warn("No :( ");
-  }
-});
-```
-#### Quick request
-```js
-permissions.requestPermission(permissions.CAMERA, success, error);
-
-function error() {
-  console.warn('Camera permission is not turned on');
-}
-
-function success( status ) {
-  if( !status.hasPermission ) error();
-}
-```
-#### Example multiple permissions
-```js
-var list = [
-  permissions.CAMERA,
-  permissions.GET_ACCOUNTS
-];
-
-permissions.hasPermission(list, callback, null);
-
-function error() {
-  console.warn('Camera or Accounts permission is not turned on');
-}
-
-function success( status ) {
-  if( !status.hasPermission ) {
-  
-    permissions.requestPermissions(
-      list,
+    permissions.requestPermission(
+      permissions.CAMERA,
       function(status) {
-        if( !status.hasPermission ) error();
+        if(!status.hasPermission) errorCallback();
       },
-      error);
+      errorCallback);
   }
 }
+```
+
+or you can use this API to perform the same actions of the snippet above:
+
+```javascript
+var permissions = cordova.plugins.permissions;
+permissions.checkAndGetPermissions([permissions.CAMERA, permissions.READ_CONTACTS])
+.then(() => {
+  //permissions are granted
+})
+.catch(error => {
+  //some permissions are not granted
+  console.log(error);
+});
 ```
 
 License
