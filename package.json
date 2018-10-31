@@ -15,19 +15,13 @@
     "url": "git+https://github.com/akilude/cordova-plugin-android-permission.git"
   },
   "keywords": [
-    "ecosystem:cordova",
-    "cordova-android",
-    "cordova-browser",
-    "cordova-ios"
   ],
   "engines": [
     {
       "name": "cordova",
-      "version": ">=5.0.0"
+      "version": ">=7.0.0"
     }
   ],
-  "author": "Jason Yang",
-  "license": "BSD",
   "bugs": {
     "url": "https://github.com/akilude/cordova-plugin-android-permission/issues"
   },

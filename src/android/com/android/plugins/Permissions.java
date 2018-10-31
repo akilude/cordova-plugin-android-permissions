@@ -1,7 +1,6 @@
 package com.android.plugins;
 
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -11,7 +10,6 @@ import org.json.JSONObject;
 
 /**
  * Created by JasonYang on 2016/3/11.
- * Modified by L0laapk3 on 19/9/2017.
  */
 public class Permissions extends CordovaPlugin {
 
@@ -24,7 +22,6 @@ public class Permissions extends CordovaPlugin {
     private static final String KEY_ERROR = "error";
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_RESULT_PERMISSION = "hasPermission";
-    private static final String KEY_RESULT_AUTODENY = "neverAskAgainFlag";
 
     private CallbackContext permissionsCallback;
 
@@ -68,10 +65,6 @@ public class Permissions extends CordovaPlugin {
             //Call checkPermission again to verify
             boolean hasAllPermissions = hasAllPermissions(permissions);
             addProperty(returnObj, KEY_RESULT_PERMISSION, hasAllPermissions);
-            if (hasAllPermissions)
-                addProperty(returnObj, KEY_RESULT_AUTODENY, false);
-            else
-                addProperty(returnObj, KEY_RESULT_AUTODENY, hasAnyNeverAskAgainFlag(permissions));
             permissionsCallback.success(returnObj);
         } else {
             addProperty(returnObj, KEY_ERROR, ACTION_REQUEST_PERMISSION);
@@ -90,13 +83,11 @@ public class Permissions extends CordovaPlugin {
         } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             JSONObject returnObj = new JSONObject();
             addProperty(returnObj, KEY_RESULT_PERMISSION, true);
-            addProperty(returnObj, KEY_RESULT_AUTODENY, false);
             callbackContext.success(returnObj);
         } else {
             try {
                 JSONObject returnObj = new JSONObject();
-                boolean hasPermission = cordova.hasPermission(permission.getString(0));
-                addProperty(returnObj, KEY_RESULT_PERMISSION, hasPermission);
+                addProperty(returnObj, KEY_RESULT_PERMISSION, cordova.hasPermission(permission.getString(0)));
                 callbackContext.success(returnObj);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -113,12 +104,10 @@ public class Permissions extends CordovaPlugin {
         } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             JSONObject returnObj = new JSONObject();
             addProperty(returnObj, KEY_RESULT_PERMISSION, true);
-            addProperty(returnObj, KEY_RESULT_AUTODENY, false);
             callbackContext.success(returnObj);
         } else if (hasAllPermissions(permissions)) {
             JSONObject returnObj = new JSONObject();
             addProperty(returnObj, KEY_RESULT_PERMISSION, true);
-            addProperty(returnObj, KEY_RESULT_AUTODENY, false);
             callbackContext.success(returnObj);
         } else {
             permissionsCallback = callbackContext;
@@ -152,28 +141,6 @@ public class Permissions extends CordovaPlugin {
         }
 
         return true;
-    }
-
-    private boolean hasAnyNeverAskAgainFlag(String[] permissions) {
-
-        for (String permission : permissions) {
-            if(GetNeverAskAgainFlag(permission)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    //only call on permissions that are denied!
-    private boolean GetNeverAskAgainFlag(String permission) {
-        try {
-            if (cordova.hasPermission(permission)) return false;
-            return Build.VERSION.SDK_INT >= 23 && !ActivityCompat.shouldShowRequestPermissionRationale(cordova.getActivity(), permission);
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-        }
-        return false;
     }
 
     private void addProperty(JSONObject obj, String key, Object value) {
