@@ -192,9 +192,8 @@ Permissions.prototype = {
             var reject = function(){
                 _reject(new Error(permission + ' is not turned on'));
             };
-            self.hasPermission(
-                permission,
-                function(status){
+            self.checkPermission(
+                permission).then(function(status){
                     if(status.hasPermission){
                         resolve();
                         return;
@@ -208,8 +207,10 @@ Permissions.prototype = {
                         },
                         reject
                     );
-                },
-                reject
+                }function(e){
+                    reject
+                }
+                
             );
         };
         return typeof successCallback === "function"
@@ -237,6 +238,11 @@ Permissions.prototype = {
     }
 
 };
+
+
+
+
+
 
 
 
